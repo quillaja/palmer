@@ -25,26 +25,29 @@ def do(func, times, end=None, pause=0):
     return None, i
 
 def scrape():
+    """
+    Does the scraping.
+    """
     t = str(int(time.time()))
-    tformat = time.strftime('%Y-%m-%d_%H:%M:%S')
+    tformat = time.strftime('%Y-%m-%d %H:%M:%S')
     url = 'http://www.timberlinelodge.com/wp-content/themes/Jupiter-child/cams/palmerbottom.jpg?nocache=' + t
     filename = '/home/quillaja/static.quillaja.net/palmer/img/palmer_%s.jpg' % t
+    logfile = 'scrape.log'
     
     # attempt to get url up to 2 times, with 60 seconds between each attempt
     r, tries = do(lambda: requests.get(url), 2, lambda r: len(r.content) > 30000, 60)
     
-    # r = requests.get(url)
-    # r.raise_for_status()
-    # if len(r.content) < 50000:
-    #     raise IOError('Data recieved too short')
     if r:
         with open(filename, 'wb') as f:
             f.write(r.content)
-        print('%s: Completed successfully in %s tries.' % (tformat, tries))
+        
+        status = '%s: Success after %s tries.\n' % (tformat, tries)
     else:
-        sys.stderr.write('%s: %s attempts to scrape failed.' % (tformat, tries))
-        #raise IOError('Attempts to scrape t = %s failed.' % t)
+        status = '%s: Failed after %s tries.\n' % (tformat, tries)
+        
+    with open(logfile, 'w') as log:
+        log.write(status)
 
 # do actual scraping only bewteen 5am and 10pm, not at night
-if 5 <= time.localtime().tm_hour <= 22:
+if True:#5 <= time.localtime().tm_hour <= 22:
     scrape()

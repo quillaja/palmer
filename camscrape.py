@@ -72,7 +72,7 @@ def scrape():
     #r, tries = do(lambda: requests.get(url), 2, lambda r: len(r.content) > 30000, 60)
     r = requests.get(url)
     
-    if r not None and len(r.content) > 30000:
+    if (r is not None) and (len(r.content) > 30000):
         with open(filename, 'wb') as f:
             f.write(r.content)
         
@@ -87,7 +87,7 @@ def main():
     if is_between_twilight(sun_hours):
         scrape()
     else:
-        log('No scraping between %s:00 and %s:00.' % (sun_hours[0], sun_hours[1]))
+        log('No scraping between %s:00 and %s:00.' % (sun_hours[1], sun_hours[0]))
         
 if __name__ == '__main__':
     main()

@@ -72,7 +72,7 @@ def scrape():
     #r, tries = do(lambda: requests.get(url), 2, lambda r: len(r.content) > 30000, 60)
     r = requests.get(url)
     
-    if r not null and len(r.content) > 30000:
+    if r not None and len(r.content) > 30000:
         with open(filename, 'wb') as f:
             f.write(r.content)
         

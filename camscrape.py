@@ -52,7 +52,7 @@ def sun(twilight='naut'):
 
     srise = portland.previous_rising(ephem.Sun(), use_center=True) #returns UTC
     sset = portland.next_setting(ephem.Sun(), use_center=True) #returns UTC
-    return (ephem.localtime(srise).hour, ephem.localtime(sset).hour + 1)
+    return (ephem.localtime(srise).hour, ephem.localtime(sset).hour)
 
 def is_between_twilight(sun_rise_set):
     """Test if current hour is between sunrise and sunset."""
@@ -69,25 +69,26 @@ def scrape():
     filename = '/home/quillaja/static.quillaja.net/palmer/img/palmer_%s.jpg' % t
     
     # attempt to get url up to 2 times, with 60 seconds between each attempt
-    r, tries = do(lambda: requests.get(url), 2, lambda r: len(r.content) > 30000, 60)
+    #r, tries = do(lambda: requests.get(url), 2, lambda r: len(r.content) > 30000, 60)
+    r = requests.get(url)
     
-    if r:
+    if r not null and len(r.content) > 30000:
         with open(filename, 'wb') as f:
             f.write(r.content)
         
-        log('Success (%s)' % tries)
+        log('Success')
     else:
-        log('Failure (%s)' % tries)
+        log('Failure')
     
     
 def main():
     # do actual scraping only bewteen astronomical twilight sunrise and sunset, not at night
     sun_hours = sun('astro')
-    if True:#is_between_twilight(sun_hours):
-        log(sun_hours)
+    if is_between_twilight(sun_hours):
         scrape()
     else:
-        log('No scrape: %s' % sun_hours)
+        log('No scraping between %s:00 and %s:00.' % (sun_hours[0], sun_hours[1]))
         
 if __name__ == '__main__':
     main()
+    

@@ -5,6 +5,15 @@ import time
 import ephem
 import requests
 
+def log(msg):
+    '''write to log file'''
+    
+    logfile = '/home/quillaja/static.quillaja.net/palmer/scrape.log'
+    datefmt='%Y-%d-%m %H:%M:%S'
+    fmt='%s\t%s\n'
+    with open(logfile, 'a') as f:
+        f.write(fmt % (time.strftime(datefmt), msg))
+
 def do(func, times, end=None, pause=0):
     """
     Does a task a specificed number of times, or until the end
@@ -25,32 +34,39 @@ def do(func, times, end=None, pause=0):
 
     return None, i
 
-def sun():
+def sun(twilight='naut'):
     """Use PyEphem to calculate sunrise and sunset for the current day."""
+    
+    #pyephem requires horizon angle as a string
+    horizons = {
+        'civil': '-6',
+        'naut': '-12',
+        'astro': '-18'
+    }
+    
     portland = ephem.Observer()
-    portland.horizon = '-18' #-6, -12, -18: civil, nautical, astronomical
-    portland.elevation = 4000 #4000 meters (ie Hood summit)
-    portland.lat, portland.lon = '45.5', '-122.6' #Portland, OR 45.4923221,-122.6394305
-    portland.date = time.strftime('%Y/%m/%d') + ' 12:00:00' #today at noon
+    portland.horizon = horizons[twilight] #-6, -12, -18: civil, nautical, astronomical
+    portland.elevation = 3500 #3500 meters (ie Hood summit)
+    portland.lat, portland.lon = '45.37', '-121.70' #Hood summit 45.373505,-121.6962728
+    portland.date = time.strftime('%Y/%m/%d') + ' 19:00:00' #today at noon PT, in UTC
 
-    srise = portland.previous_rising(ephem.Sun(), use_center=True)
-    sset = portland.next_setting(ephem.Sun(), use_center=True)
+    srise = portland.previous_rising(ephem.Sun(), use_center=True) #returns UTC
+    sset = portland.next_setting(ephem.Sun(), use_center=True) #returns UTC
     return (ephem.localtime(srise).hour, ephem.localtime(sset).hour + 1)
 
-def is_between_twilight():
+def is_between_twilight(sun_rise_set):
     """Test if current hour is between sunrise and sunset."""
-    srise, sset = sun()
-    return srise <= time.localtime().tm_hour <= sset
+    srise, sset = sun_rise_set
+    curhour = time.localtime().tm_hour
+    return srise <= curhour <= sset
     
 def scrape():
     """
     Does the scraping.
     """
     t = str(int(time.time()))
-    tformat = time.strftime('%Y-%m-%d %H:%M:%S')
     url = 'http://www.timberlinelodge.com/wp-content/themes/Jupiter-child/cams/palmerbottom.jpg?nocache=' + t
     filename = '/home/quillaja/static.quillaja.net/palmer/img/palmer_%s.jpg' % t
-    logfile = '/home/quillaja/static.quillaja.net/palmer/scrape.log'
     
     # attempt to get url up to 2 times, with 60 seconds between each attempt
     r, tries = do(lambda: requests.get(url), 2, lambda r: len(r.content) > 30000, 60)
@@ -59,13 +75,19 @@ def scrape():
         with open(filename, 'wb') as f:
             f.write(r.content)
         
-        status = '%s: Success after %s tries.\n' % (tformat, tries)
+        log('Success (%s)' % tries)
     else:
-        status = '%s: Failed after %s tries.\n' % (tformat, tries)
-        
-    with open(logfile, 'a') as f:
-        f.write(status)
+        log('Failure (%s)' % tries)
     
-# do actual scraping only bewteen astronomical twilight sunrise and sunset, not at night
-if is_between_twilight():
-    scrape()
+    
+def main():
+    # do actual scraping only bewteen astronomical twilight sunrise and sunset, not at night
+    sun_hours = sun('astro')
+    if True:#is_between_twilight(sun_hours):
+        log(sun_hours)
+        scrape()
+    else:
+        log('No scrape: %s' % sun_hours)
+        
+if __name__ == '__main__':
+    main()

@@ -82,12 +82,12 @@ def scrape():
     
     
 def main():
-    # do actual scraping only bewteen astronomical twilight sunrise and sunset, not at night
-    sun_hours = sun('astro')
+    # do actual scraping only bewteen nautical twilight sunrise and sunset, not at night
+    sun_hours = sun('naut')
     if is_between_twilight(sun_hours):
         scrape()
     else:
-        log('No scraping between %s:00 and %s:00.' % (sun_hours[1], sun_hours[0]))
+        log('No scraping %s:00 to %s:00.' % (sun_hours[1] + 1, sun_hours[0]))
         
 if __name__ == '__main__':
     main()

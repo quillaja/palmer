@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import sys
 import time
+from PIL import Image
+import StringIO
 
 import ephem
 import requests
@@ -10,9 +12,9 @@ def log(msg):
     
     logfile = '/home/quillaja/static.quillaja.net/palmer/scrape.log'
     datefmt='%Y-%d-%m %H:%M:%S'
-    fmt='%s\t%s\n'
+    fmt='{0}\t{1}\n'
     with open(logfile, 'a') as f:
-        f.write(fmt % (time.strftime(datefmt), msg))
+        f.write(fmt.format(time.strftime(datefmt), msg))
 
 def do(func, times, end=None, pause=0):
     """
@@ -59,20 +61,29 @@ def is_between_twilight(sun_rise_set):
     srise, sset = sun_rise_set
     curhour = time.localtime().tm_hour
     return srise <= curhour <= sset
+
+def is_img_size(bytestring, width, height):
+    """
+    Determines if the image, given as a string of bytes, is dimentions width x height.
+    Uses PIL to read size from image.
+    """
+    strf = StringIO.StringIO(bytestring)
+    img = Image.open(strf)
+    return width == img.size[0] and height == img.size[1]
     
 def scrape():
     """
     Does the scraping.
     """
     t = str(int(time.time()))
-    url = 'http://www.timberlinelodge.com/wp-content/themes/Jupiter-child/cams/palmerbottom.jpg?nocache=' + t
-    filename = '/home/quillaja/static.quillaja.net/palmer/img/palmer_%s.jpg' % t
+    url = 'http://www.timberlinelodge.com/wp-content/themes/Jupiter-child/cams/palmerbottom.jpg?nocache={}'.format(t)
+    filename = '/home/quillaja/static.quillaja.net/palmer/img/palmer_{}.jpg'.format(t)
     
-    # attempt to get url up to 2 times, with 60 seconds between each attempt
-    #r, tries = do(lambda: requests.get(url), 2, lambda r: len(r.content) > 30000, 60)
+    # attempt to get url
     r = requests.get(url)
     
-    if (r is not None) and (len(r.content) > 30000):
+    #test image size, and write
+    if (r is not None) and is_img_size(r.content, 640, 480):
         with open(filename, 'wb') as f:
             f.write(r.content)
         
@@ -87,7 +98,7 @@ def main():
     if is_between_twilight(sun_hours):
         scrape()
     else:
-        log('No scraping %s:00 to %s:00.' % (sun_hours[1] + 1, sun_hours[0]))
+        log('No scraping {0}:00 to {1}:00.'.format(sun_hours[1] + 1, sun_hours[0]))
         
 if __name__ == '__main__':
     main()

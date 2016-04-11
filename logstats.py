@@ -27,7 +27,7 @@ def main():
                     noscrape += 1
         
         runs = success + failure + noscrape
-        print('{}\nRun: {} times\nSuccess: {}\tFailure: {}\tNo scrape: {}'.format(date, runs, success, failure, noscrape))
+        print('\n{}\nRun: {} times\nSuccess: {}\tFailure: {}\tNo scrape: {}'.format(date, runs, success, failure, noscrape))
     except Exception as e:
         print(e)
 

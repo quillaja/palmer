@@ -83,7 +83,7 @@ def scrape():
     r = requests.get(url)
     
     #test image size, and write
-    if (r is not None) and is_img_size(r.content, 640, 480):
+    if (r is not None) and len(r.content) > 30000: #is_img_size(r.content, 640, 480):
         with open(filename, 'wb') as f:
             f.write(r.content)
         
@@ -93,12 +93,16 @@ def scrape():
     
     
 def main():
-    # do actual scraping only bewteen nautical twilight sunrise and sunset, not at night
-    sun_hours = sun('naut')
-    if is_between_twilight(sun_hours):
-        scrape()
-    else:
-        log('No scraping {0}:00 to {1}:00.'.format(sun_hours[1] + 1, sun_hours[0]))
+    try:
+        # do actual scraping only bewteen nautical twilight sunrise and sunset, not at night
+        sun_hours = sun('naut')
+        if is_between_twilight(sun_hours):
+            scrape()
+        else:
+            log('No scraping {0}:00 to {1}:00.'.format(sun_hours[1] + 1, sun_hours[0]))
+    except Exception as e:
+        log('Failure')
+        print(e)
         
 if __name__ == '__main__':
     main()

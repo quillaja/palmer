@@ -2,16 +2,18 @@ import argparse
 import sys
 
 LOGARCHIVE = '/home/quillaja/static.quillaja.net/palmer/img/archive/'
-LOGPATHFMT = LOGARCHIVE+'{}.log'
+LOGPATHFMT = LOGARCHIVE + '{}.log'
+
 
 def process_log():
     pass
+
 
 def main():
     if not sys.argv[1]:
         print('no date provided')
         return
-    
+
     date = sys.argv[1]
     success = 0
     failure = 0
@@ -25,11 +27,16 @@ def main():
                     failure += 1
                 elif 'No scraping' in line:
                     noscrape += 1
-        
+
         runs = success + failure + noscrape
-        print('\n{}\nRun: {} times\nSuccess: {}\tFailure: {}\tNo scrape: {}'.format(date, runs, success, failure, noscrape))
+        scrapes = success + failure
+        print(
+            '\n{}\nRun: {} times\tNo scrape: {}\nSuccess: {} ({})\tFailure: {} ({})'.format(
+                date, runs, noscrape, success, 100.0 * success / scrapes,
+                failure, 100.0 * failure / scrapes))
     except Exception as e:
         print(e)
+
 
 if __name__ == '__main__':
     main()

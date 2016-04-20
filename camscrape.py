@@ -5,16 +5,15 @@ from PIL import Image
 
 import ephem
 import requests
+import settings
 
 
 def log(msg):
     '''write to log file'''
 
-    logfile = '/home/quillaja/static.quillaja.net/palmer/scrape.log'
-    datefmt = '%Y-%d-%m %H:%M:%S'
     fmt = '{0}\t{1}\n'
-    with open(logfile, 'a') as f:
-        f.write(fmt.format(time.strftime(datefmt), msg))
+    with open(settings.ACTIVELOG_PATH, 'a') as f:
+        f.write(fmt.format(time.strftime(settings.ACTIVELOG_DATEFMT), msg))
 
 
 def do(func, times, end=None, pause=0):
@@ -38,16 +37,16 @@ def do(func, times, end=None, pause=0):
     return None, i
 
 
-def sun(twilight='naut'):
+def sun(twilight='nautical'):
     """Use PyEphem to calculate sunrise and sunset for the current day."""
 
     #pyephem requires horizon angle as a string
-    horizons = {'civil': '-6', 'naut': '-12', 'astro': '-18'}
+    horizons = {'civil': '-6', 'nautical': '-12', 'astronomical': '-18'}
 
     portland = ephem.Observer()
     portland.horizon = horizons[twilight]  #-6, -12, -18: civil, nautical, astronomical
-    portland.elevation = 3500  #3500 meters (ie Hood summit)
-    portland.lat, portland.lon = '45.37', '-121.70'  #Hood summit 45.373505,-121.6962728
+    portland.elevation = settings.LOC_ELEV
+    portland.lat, portland.lon = settings.LOC_LAT, settings.LOC_LON
     portland.date = time.strftime('%Y/%m/%d') + ' 19:00:00'  #today at noon PT, in UTC
 
     srise = portland.previous_rising(ephem.Sun(), use_center=True)  #returns UTC
@@ -77,14 +76,14 @@ def scrape():
     Does the scraping.
     """
     t = str(int(time.time()))
-    url = 'http://www.timberlinelodge.com/wp-content/themes/Jupiter-child/cams/palmerbottom.jpg?nocache={}'.format(t)
-    filename = '/home/quillaja/static.quillaja.net/palmer/img/palmer_{}.jpg'.format(t)
+    url = settings.WEBCAM_URL.format(t)
+    filename = settings.IMAGE_PATH.format(t)
 
     # attempt to get url
     r = requests.get(url)
 
     #test image validity using >30KB, and write
-    if (r is not None) and len(r.content) > 30000:
+    if (r is not None) and len(r.content) > settings.MIN_VALID_IMG_SIZE:
         with open(filename, 'wb') as f:
             f.write(r.content)
 
@@ -96,7 +95,7 @@ def scrape():
 def main():
     try:
         # do actual scraping only bewteen nautical twilight sunrise and sunset, not at night
-        sun_hours = sun('naut')
+        sun_hours = sun(settings.TWILIGHT_TYPE)
         if is_between_twilight(sun_hours):
             scrape()
         else:

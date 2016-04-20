@@ -1,7 +1,8 @@
 import sys
 
-LOGARCHIVE = '/home/quillaja/static.quillaja.net/palmer/img/archive/'
-LOGPATHFMT = LOGARCHIVE + '{}.log'
+import settings
+
+LOGPATHFMT = settings.ARCHIVE_PATH + '{}.log'
 
 
 def main():

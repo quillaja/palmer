@@ -63,12 +63,34 @@ def is_between_twilight(sun_rise_set):
 
 def is_img_size(bytestring, width, height):
     """
+    DEPRECATED
     Determines if the image, given as a string of bytes, is dimentions width x height.
     Uses PIL to read size from image.
     """
     strf = StringIO.StringIO(bytestring)
     img = Image.open(strf)
     return width == img.size[0] and height == img.size[1]
+
+def isvalidimage(bytestring):
+    """
+    Determines if the image is valid or not, based on its dimensions and
+    the content of the first row of the image. Valid image dimensions are in
+    settings.VALID_IMG_DIMENSIONS and valid data is in settings.INVALID_IMG_DATA.
+    """
+
+    strf = StringIO.StringIO(bytestring)
+    img = Image.open(strf)
+
+    # test size
+    if img.size != settings.VALID_IMG_DIMENSIONS:
+        return False
+
+    img_width = img.size[0]
+    img_data = list(img.getdata())[0:img_width]
+    bad_data = [settings.INVALID_IMG_DATA] * img_width
+
+    # compare first row of data with generated bad data
+    return img_data != bad_data
 
 
 def scrape():
@@ -82,14 +104,14 @@ def scrape():
     # attempt to get url
     r = requests.get(url)
 
-    #test image validity using >30KB, and write
-    if (r is not None) and len(r.content) > settings.MIN_VALID_IMG_SIZE:
+    #test image validity and write
+    if (r is not None) and isvalidimage(r.content):
         with open(filename, 'wb') as f:
             f.write(r.content)
 
         log('Success')
     else:
-        log('Failure')
+        log('Failure (invalid image or no data)')
 
 
 def main():
@@ -102,7 +124,7 @@ def main():
             log('No scraping {0}:00 to {1}:00.'.format(sun_hours[1] + 1,
                                                        sun_hours[0]))
     except Exception as e:
-        log('Failure')
+        log('Failure (other exception)')
         print(e)
 
 

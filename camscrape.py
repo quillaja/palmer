@@ -105,7 +105,7 @@ def scrape():
     r = requests.get(url)
 
     #test image validity and write
-    if (r is not None) and isvalidimage(r.content):
+    if (r is not None):# and isvalidimage(r.content):
         with open(filename, 'wb') as f:
             f.write(r.content)
 

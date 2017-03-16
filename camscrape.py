@@ -101,8 +101,12 @@ def scrape():
     url = settings.WEBCAM_URL.format(t)
     filename = settings.IMAGE_PATH.format(t)
 
+    # set up headers
+    headers = requests.utils.default_headers()
+    headers.update({'User-Agent':settings.USER_AGENT})
+
     # attempt to get url
-    r = requests.get(url)
+    r = requests.get(url, headers=headers)
 
     #test image validity and write
     if (r is not None):# and isvalidimage(r.content):

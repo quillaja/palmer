@@ -14,5 +14,7 @@ LOC_ELEV = 3500  #3500 meters (ie Hood summit)
 LOC_LAT = '45.37'  #Hood summit 45.373505,-121.6962728
 LOC_LON = '-121.70'
 
+USER_AGENT = 'Mozilla/5.0'
+
 # log stats
 ARCHIVE_PATH = '/home/quillaja/static.quillaja.net/palmer/img/archive/'

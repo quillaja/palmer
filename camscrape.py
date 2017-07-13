@@ -78,6 +78,9 @@ def isvalidimage(bytestring):
     settings.VALID_IMG_DIMENSIONS and valid data is in settings.INVALID_IMG_DATA.
     """
 
+    if len(bytestring) == 0:
+        return False
+
     strf = StringIO.StringIO(bytestring)
     img = Image.open(strf)
 
@@ -109,7 +112,7 @@ def scrape():
     r = requests.get(url, headers=headers)
 
     #test image validity and write
-    if (r is not None):# and isvalidimage(r.content):
+    if (r is not None) and isvalidimage(r.content):
         with open(filename, 'wb') as f:
             f.write(r.content)
 

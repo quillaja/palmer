@@ -44,7 +44,7 @@ def process_date(date, fmt='text'):
 def main():
     try:
         date = sys.argv[1]
-        process_date(date)
+        print(process_date(date))
     except IndexError:
         print('no date provided')
         return

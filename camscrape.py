@@ -1,6 +1,5 @@
-#!/usr/bin/python
 import time
-import StringIO
+from io import StringIO
 from PIL import Image
 
 import ephem
@@ -28,7 +27,7 @@ def do(func, times, end=None, pause=0):
     if end is None:
         end = lambda x: False
 
-    for rval, i in ((func(), i) for i in xrange(1, times + 1)):
+    for rval, i in ((func(), i) for i in range(1, times + 1)):
         if end(rval):
             return rval, i
         if i < times:
@@ -67,7 +66,7 @@ def is_img_size(bytestring, width, height):
     Determines if the image, given as a string of bytes, is dimentions width x height.
     Uses PIL to read size from image.
     """
-    strf = StringIO.StringIO(bytestring)
+    strf = StringIO(bytestring)
     img = Image.open(strf)
     return width == img.size[0] and height == img.size[1]
 
@@ -81,7 +80,7 @@ def isvalidimage(bytestring):
     if len(bytestring) == 0:
         return False
 
-    strf = StringIO.StringIO(bytestring)
+    strf = StringIO(bytestring)
     img = Image.open(strf)
 
     # test size

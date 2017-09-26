@@ -1,5 +1,5 @@
 import time
-from io import StringIO
+from io import BytesIO #used StringIO in python2, BytesIO in python3
 from PIL import Image
 
 import ephem
@@ -66,7 +66,7 @@ def is_img_size(bytestring, width, height):
     Determines if the image, given as a string of bytes, is dimentions width x height.
     Uses PIL to read size from image.
     """
-    strf = StringIO(bytestring)
+    strf = BytesIO(bytestring)
     img = Image.open(strf)
     return width == img.size[0] and height == img.size[1]
 
@@ -80,7 +80,7 @@ def isvalidimage(bytestring):
     if len(bytestring) == 0:
         return False
 
-    strf = StringIO(bytestring)
+    strf = BytesIO(bytestring)
     img = Image.open(strf)
 
     # test size

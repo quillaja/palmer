@@ -66,7 +66,7 @@ def is_img_size(bytestring, width, height):
     Determines if the image, given as a string of bytes, is dimentions width x height.
     Uses PIL to read size from image.
     """
-    strf = StringIO(bytestring)
+    strf = BytesIO(bytestring)
     img = Image.open(strf)
     return width == img.size[0] and height == img.size[1]
 
@@ -80,7 +80,7 @@ def isvalidimage(bytestring):
     if len(bytestring) == 0:
         return False
 
-    strf = StringIO(bytestring)
+    strf = BytesIO(bytestring)
     strf.seek(0)
     img = Image.open(strf)
 
@@ -112,7 +112,7 @@ def scrape():
     r = requests.get(url, headers=headers)
 
     #test image validity and write
-    if (r is not None) and isvalidimage(r.text):
+    if (r is not None) and isvalidimage(r.content):
         with open(filename, 'wb') as f:
             f.write(r.content)
 

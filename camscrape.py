@@ -1,5 +1,5 @@
 import time
-from io import BytesIO #used StringIO in python2, BytesIO in python3
+from io import StringIO, BytesIO #used StringIO in python2, BytesIO in python3
 from PIL import Image
 
 import ephem
@@ -66,7 +66,7 @@ def is_img_size(bytestring, width, height):
     Determines if the image, given as a string of bytes, is dimentions width x height.
     Uses PIL to read size from image.
     """
-    strf = BytesIO(bytestring)
+    strf = StringIO(bytestring)
     img = Image.open(strf)
     return width == img.size[0] and height == img.size[1]
 
@@ -80,7 +80,8 @@ def isvalidimage(bytestring):
     if len(bytestring) == 0:
         return False
 
-    strf = BytesIO(bytestring)
+    strf = StringIO(bytestring)
+    strf.seek(0)
     img = Image.open(strf)
 
     # test size
@@ -111,7 +112,7 @@ def scrape():
     r = requests.get(url, headers=headers)
 
     #test image validity and write
-    if (r is not None) and isvalidimage(r.content):
+    if (r is not None) and isvalidimage(r.text):
         with open(filename, 'wb') as f:
             f.write(r.content)
 

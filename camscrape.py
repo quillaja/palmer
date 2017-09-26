@@ -1,5 +1,5 @@
 import time
-from io import StringIO, BytesIO #used StringIO in python2, BytesIO in python3
+from io import BytesIO #used StringIO in python2, BytesIO in python3
 from PIL import Image
 
 import ephem

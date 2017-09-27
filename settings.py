@@ -3,7 +3,8 @@ ACTIVELOG_PATH = '/home/quillaja/static.quillaja.net/palmer/scrape.log'
 ACTIVELOG_DATEFMT = '%Y-%d-%m %H:%M:%S'
 
 TWILIGHT_TYPE = 'nautical'
-WEBCAM_URL = 'http://www.timberlinelodge.com/wp-content/themes/Jupiter-child/cams/palmerbottom.jpg?nocache={}'
+WEBCAM_URL = 'https://www.timberlinelodge.com/snowcameras//palmerbottom.jpg?nocache={}'
+# WEBCAM_URL = 'http://www.timberlinelodge.com/wp-content/themes/Jupiter-child/cams/palmerbottom.jpg?nocache={}'
 IMAGE_PATH = '/home/quillaja/static.quillaja.net/palmer/img/palmer_{}.jpg'
 
 MIN_VALID_IMG_SIZE = 20000

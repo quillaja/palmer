@@ -1,6 +1,6 @@
 import time
 from io import BytesIO #used StringIO in python2, BytesIO in python3
-from PIL import Image
+from PIL import Image, ImageFile
 
 import ephem
 import requests
@@ -76,6 +76,8 @@ def isvalidimage(bytestring):
     the content of the first row of the image. Valid image dimensions are in
     settings.VALID_IMG_DIMENSIONS and valid data is in settings.INVALID_IMG_DATA.
     """
+    #supposedly fix 'image truncated' errors
+    ImageFile.LOAD_TRUNCATED_IMAGES = True 
 
     if len(bytestring) == 0:
         return False
